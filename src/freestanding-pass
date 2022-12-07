@@ -1,11 +1,87 @@
 #!/bin/sh
-key=$1
-store=$2
-pass=$3
+usage() {
+  echo "Usage: $(basename $0) --keys [key1 key2...] --store [password store] -- [arguments to 'pass']"
+}
 
-if [ $# -ne 3 ]; then
-  echo "Usage: $(basename $0) [decryption key] [password store] [path to password in store]"
+
+keys=""
+store=""
+
+parsekeys() {
+  for arg in $@; do
+    case $arg in
+      --)
+        break
+        ;;
+      --*|-*)
+        break
+        ;;
+      *)
+        if [[ $keys == "" ]]; then
+          keys="$arg"
+        else
+          keys="$keys $arg"
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+while [[ $1 != "--" ]] && [[ $# -gt 0 ]]; do
+  case $1 in
+    "--keys" | "--key")
+      shift
+      parsekeys $@
+      ;;
+    "--store")
+      store=$2
+      shift 2
+      ;;
+    "--help")
+      usage
+      exit 0
+      ;;
+    --*|-*)
+      echo "Unknown argument $1"
+      exit 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+if [[ $1 == "--" ]]; then
+  shift # Remove final --
+else
+  usage
   exit 2
 fi
 
-$(dirname "$0")/freestanding-gpg $key --decrypt ${store}/${pass}.gpg 2>/dev/null
+if [[ $keys == "" ]]; then
+  usage
+  exit 2
+fi
+
+if [[ $store == "" ]]; then
+  usage
+  exit 2
+fi
+
+# Make pass use our gpg wrapper with our keys
+export FREESTANDING_GPGKEYS="$keys"
+export FREESTANDING_PATH="$(dirname "$0")"
+gpg() {
+  $FREESTANDING_PATH/freestanding-gpg --keys $FREESTANDING_GPGKEYS -- $@
+}
+gpg2() {
+  gpg $@
+}
+export -f gpg
+export -f gpg2
+
+# Make pass use specified store
+export PASSWORD_STORE_DIR="$store"
+
+pass $@

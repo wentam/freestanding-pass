@@ -1,5 +1,62 @@
 #!/bin/sh
-key=$1
+usage() {
+  echo "Usage: $(basename $0) --keys [key1 key2...] -- [arguments to gpg]"
+}
+
+keys=""
+
+parsekeys() {
+  for arg in $@; do
+    case $arg in
+      --)
+        break
+        ;;
+      --*|-*)
+        break
+        ;;
+      *)
+        if [[ $keys == "" ]]; then
+          keys="$arg"
+        else
+          keys="$keys $arg"
+        fi
+        shift
+        ;;
+    esac
+  done
+}
+
+while [[ $1 != "--" ]] && [[ $# -gt 0 ]]; do
+  case $1 in
+    "--keys" | "--key")
+      shift
+      parsekeys $@
+      ;;
+    "--help")
+      usage
+      exit 0
+      ;;
+    --*|-*)
+      echo "Unknown argument $1"
+      exit 2
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+if [[ $1 == "--" ]]; then
+  shift # Remove final --
+else
+  usage
+  exit 2
+fi
+
+if [[ $keys == "" ]]; then
+  usage
+  exit 2
+fi
 
 keyring_dir="/run/user/$(id -u)/$$-keyring/"
 
@@ -13,7 +70,16 @@ cleanup() {
 }
 trap cleanup EXIT
 
-gpg --yes --homedir $keyring_dir --import $key
+for key in $keys; do
+  command gpg --pinentry-mode loopback --quiet --homedir $keyring_dir --import $key
+done
 
-shift 1 # discard $1
-gpg --yes --homedir $keyring_dir $@
+extraargs="--output -"
+for arg in $@; do
+  if [[ $arg == "-o" ]] || [[ $arg == "--output" ]]; then
+    extraargs=""
+    break
+  fi
+done
+
+command gpg --always-trust --pinentry-mode loopback $extraargs --homedir $keyring_dir $@

@@ -16,6 +16,8 @@
         postPatch = ''
           substituteInPlace src/freestanding-gpg \
             --replace "gpg" "${pkgs.gnupg}/bin/gpg"
+          substituteInPlace src/freestanding-pass \
+            --replace "pass \$@" "${pkgs.pass}/bin/pass \$@"
         '';
       };
       apps.default = { type = "app"; program = "${packages.default}/bin/freestanding-pass"; };

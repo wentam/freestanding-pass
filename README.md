@@ -1,11 +1,16 @@
-Tiny shell script gpg wrapper to (read-only) access a [password store](https://www.passwordstore.org/)
+Tiny shell script gpg wrapper to access a [password store](https://www.passwordstore.org/)
 without environmental dependency (no need to import keys with gpg).
 
-Depends on gpg. Does not depend on pass.
+Depends on gpg and pass.
 
-Usage:
+Usage/examples:
 ```
-freestanding-pass my-gpg-key.asc /my/password/store my/password
+freestanding-pass --keys /my/key1.asc /my/key2.asc --store /my/pass/store -- [arguments to pass]
+freestanding-pass --keys /my/key1.asc /my/key2.asc --store /my/pass/store -- generate foo/bar
 ```
 
-Nix users can try it with: `nix run github:wentam/freestanding-pass -- my-gpg-key.asc /my/password/store my/password`
+
+Nix users can try it with something like:
+```
+nix run github:wentam/freestanding-pass -- --keys /my/key1.asc /my/key2.asc --store /my/pass/store -- generate foo/bar
+```
