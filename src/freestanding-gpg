@@ -13,7 +13,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-gpg --yes --pinentry cancel --homedir $keyring_dir --import $key
+gpg --yes --homedir $keyring_dir --import $key
 
 shift 1 # discard $1
-gpg --yes --pinentry cancel --homedir $keyring_dir $@
+gpg --yes --homedir $keyring_dir $@

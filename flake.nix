@@ -14,7 +14,7 @@
         src = ./.;
         makeFlags = [ "prefix=$(out)" ];
         postPatch = ''
-          substituteInPlace freestanding-gpg \
+          substituteInPlace src/freestanding-gpg \
             --replace "gpg" "${pkgs.gnupg}/bin/gpg"
         '';
       };
