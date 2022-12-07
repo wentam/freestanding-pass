@@ -1,4 +1,4 @@
-Tiny shell script gpg wrapper to access a [password store](https://www.passwordstore.org/)
+Tiny shell script gpg wrapper to (read-only) access a [password store](https://www.passwordstore.org/)
 without environmental dependency (no need to import keys with gpg).
 
 Depends on gpg. Does not depend on pass.
