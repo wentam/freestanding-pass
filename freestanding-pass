@@ -1,0 +1,11 @@
+#!/bin/sh
+key=$1
+store=$2
+pass=$3
+
+if [ $# -ne 3 ]; then
+  echo "Usage: $(basename $0) [decryption key] [password store] [path to password in store]"
+  exit 2
+fi
+
+$(dirname "$0")/freestanding-gpg $key --decrypt ${store}/${pass}.gpg 2>/dev/null

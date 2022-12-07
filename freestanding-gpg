@@ -1,0 +1,19 @@
+#!/bin/sh
+key=$1
+
+keyring_dir="/run/user/$(id -u)/$$-keyring/"
+
+rm -fr $keyring_dir # Just in case there's an old one laying around
+
+mkdir -p $keyring_dir
+chmod -R 700 $keyring_dir # Only the user running this should have access
+
+cleanup() {
+  rm -fr $keyring_dir
+}
+trap cleanup EXIT
+
+gpg --yes --pinentry cancel --homedir $keyring_dir --import $key
+
+shift 1 # discard $1
+gpg --yes --pinentry cancel --homedir $keyring_dir $@
