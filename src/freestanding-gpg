@@ -1,4 +1,5 @@
 #!/bin/sh
+#ff3a228e-39fc-4c4e-9aa5-09e144da397a
 usage() {
   echo "Usage: $(basename $0) --keys [key1 key2...] -- [arguments to gpg]"
 }
