@@ -59,7 +59,7 @@ if [[ $keys == "" ]]; then
   exit 2
 fi
 
-keyring_dir="/run/user/$(id -u)/$$-keyring/"
+keyring_dir="/dev/shm/$$-freestanding-keyring/" # More reliably available than /run/user/xxx
 
 rm -fr $keyring_dir # Just in case there's an old one laying around
 
